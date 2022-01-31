@@ -5,4 +5,6 @@ In this work author use segmentation technique in order to identify different gr
 
 
 Data: http://archive.ics.uci.edu/ml/datasets/online+retail
+
+
 To run the code, please download file with data.
