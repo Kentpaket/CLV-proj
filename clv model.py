@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
 
 # # Columns description
 # 
@@ -11,9 +9,6 @@
 # - **UnitPrice**: Value of each item.
 # - **CustomerID**: Identifier for customer making the purchase.
 # - **Country**: Country of customer.
-
-# In[36]:
-
 
 # Libraries
 import numpy as np, pandas as pd, re, scipy as sp, scipy.stats
@@ -35,29 +30,16 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 color = sns.color_palette()
 
 
-# In[3]:
-
-
 df_baza = pd.read_excel(io='Online Retail.xlsx')
-
 
 # #### Basic Data Analysis
 
-# In[4]:
-
-
 df_baza.info()
-
-
-# In[5]:
-
 
 #Formatting Date/Time
 df_baza['InvoiceDate'] = pd.to_datetime(df_baza['InvoiceDate'], format = '%m/%d/%Y %H:%M')
 df_baza.head()
 
-
-# In[6]:
 
 
 label = []
@@ -72,9 +54,6 @@ print(values)
 
 
 # ### Data Preperation
-
-# In[27]:
-
 
 # remove null data for description and customer ID
 df_baza.dropna(how='any',inplace=True)
@@ -93,10 +72,6 @@ print("Number of duplicated transactions:", len(df_baza[df_baza.duplicated()]))
 df_baza['Revenue']=df_baza['Quantity']*df_baza['UnitPrice']
 df_baza.isnull().sum()
 
-
-# In[28]:
-
-
 #categorical data
 df_baza['CustomerID'] = pd.Categorical(df_baza['CustomerID'].astype(int))
 df_baza['StockCode'] = pd.Categorical(df_baza['StockCode'])
@@ -110,13 +85,7 @@ df_baza['hour'] = df_baza['InvoiceDate'].dt.hour
 df_baza.head(10)
 
 
-# In[29]:
-
-
 df_baza.describe().round(2)
-
-
-# In[30]:
 
 
 # checking how many unique customer IDs are there
@@ -126,16 +95,10 @@ x = df_baza['CustomerID'].nunique()
 # printing the value
 print("There are {} number of different customers".format(x))
 
-
-# In[31]:
-
-
 df_baza.groupby('StockCode').agg({'Quantity': "sum"}).sort_values(by="Quantity", ascending=False).head(5)
 
 
 # ### Visualisation 
-
-# In[118]:
 
 
 plot = pd.DataFrame(df_baza.groupby(['month_year'])['InvoiceNo'].count()).reset_index()
@@ -146,26 +109,9 @@ plot4 = pd.DataFrame(df_baza.groupby(['month_year'])['Revenue'].mean()).reset_in
 plot5 = pd.DataFrame(df_baza.groupby(['month_year'])['Revenue'].sum()).reset_index()
 
 
-# In[87]:
-
-
 ax = sns.lineplot(x="month_year", y="InvoiceNo", data = plot)
-
-
-# In[110]:
-
-
 ax = sns.barplot(x="hour", y="InvoiceNo", data = plot3)
-
-
-# In[111]:
-
-
 ax = sns.lineplot(x = 'month_year', y='Revenue', data = plot5)
-
-
-# In[12]:
-
 
 #Price distribution
 plt.subplots(figsize=(10,8))
@@ -175,9 +121,6 @@ plt.xlabel('Unit Price')
 plt.ylabel('Normalized Distribution')
 plt.title('Unit Price Distribution')
 plt.show()
-
-
-# In[13]:
 
 
 ax = df_baza.groupby('InvoiceNo')['DayofWeek'].unique().value_counts().sort_index().plot(kind ='bar',color=color[0],figsize=(15,6))
@@ -207,9 +150,6 @@ plt.show()
 
 # ### Clustering process
 
-# In[33]:
-
-
 # assign each unique customer with certain  information
 df_cus = df_baza.groupby('CustomerID').agg({
     'Revenue': sum,
@@ -220,9 +160,6 @@ df_cus.columns = ['TotalRevenue', 'OrderCount']
 df_cus['AvgOrderValue'] = df_cus['TotalRevenue']/df_cus['OrderCount']
 
 df_cus
-
-
-# In[34]:
 
 
 # normalize data
@@ -237,9 +174,6 @@ norm_df
 
 
 # ### Select the optimal number of clusters with the Elbow Method
-
-# In[37]:
-
 
 k_range = range(2, 10)
 
@@ -261,9 +195,6 @@ plt.show()
 
 #  k=4 is our 'elbow'
 
-# In[38]:
-
-
 from sklearn.metrics import silhouette_score
 
 silhouettes = []
@@ -281,9 +212,6 @@ plt.show()
 
 # Again, 4 is our optimal point
 
-# In[40]:
-
-
 # fitting kmeans model
 kmeans = KMeans(n_clusters=4).fit(X)
 # intergate each customers and its cluster into a dataframe
@@ -291,16 +219,9 @@ fourmeans_cluster_df = norm_df.copy()
 fourmeans_cluster_df['Cluster'] = kmeans.labels_
 fourmeans_cluster_df
 
-
-# In[44]:
-
-
 # assign clusters to before-normalized data
 df_cus['Cluster'] = kmeans.labels_
 print(df_cus.groupby('Cluster').max())
-
-
-# In[47]:
 
 
 # Contribution of each cluster
